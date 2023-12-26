@@ -13,17 +13,28 @@ abstract class _FeedingScheduleStore with Store {
   ObservableFuture<List<FeedingSchedule>> feedingSchedulesFuture =
       ObservableFuture.value([]);
 
-  @observable
-  ObservableFuture<bool>? isResponseSuccess;
-
   @action
   Future<List<FeedingSchedule>> getFeedingSchedules() =>
       feedingSchedulesFuture = ObservableFuture(_pbcApi.getFeedingSchedules());
 
   @action
-  Future<List<FeedingSchedule>> deleteFeedingSchedules(int index) =>
-      feedingSchedulesFuture =
-          ObservableFuture(_pbcApi.deleteFeedingSchedule(index));
+  Future<List<FeedingSchedule>> createFeedingSchedule(
+      FeedingSchedule data) async {
+    bool success = await _pbcApi.createFeedingSchedule(data);
+
+    feedingSchedulesFuture = ObservableFuture(_pbcApi.getFeedingSchedules());
+
+    return _pbcApi.getFeedingSchedules();
+  }
+
+  @action
+  Future<List<FeedingSchedule>> deleteFeedingSchedules(int index) async {
+    bool success = await _pbcApi.deleteFeedingSchedule(index);
+
+    feedingSchedulesFuture = ObservableFuture(_pbcApi.getFeedingSchedules());
+
+    return _pbcApi.getFeedingSchedules();
+  }
 
   String timeString(FeedingSchedule schedule) =>
       "${schedule.hour}:${schedule.minutes}";

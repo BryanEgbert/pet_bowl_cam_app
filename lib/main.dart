@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/src/api/async.dart';
+import 'package:pet_bowl_cam_app/model/feeding_schedule.dart';
 import 'package:pet_bowl_cam_app/store/feeding_schedule_store.dart';
 
 void main() {
@@ -58,20 +59,36 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.amberAccent,
       ),
       body: SafeArea(child: widgets[_selectedIndex]),
-      floatingActionButton: FloatingActionButton.large(onPressed: () async {
-        final TimeOfDay? time = await showTimePicker(
-          context: context,
-          initialTime: TimeOfDay.now(),
-          orientation: Orientation.portrait,
-          builder: (context, child) {
-            return MediaQuery(
-              data:
-                  MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-              child: child!,
+      floatingActionButton: FloatingActionButton.large(
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          shape: const CircleBorder(),
+          mouseCursor: SystemMouseCursors.click,
+          onPressed: () async {
+            final TimeOfDay? time = await showTimePicker(
+              context: context,
+              initialTime: TimeOfDay.now(),
+              orientation: Orientation.portrait,
+              builder: (context, child) {
+                return MediaQuery(
+                  data: MediaQuery.of(context)
+                      .copyWith(alwaysUse24HourFormat: true),
+                  child: child!,
+                );
+              },
             );
+
+            if (time == null) return;
+
+            FeedingSchedule newData = FeedingSchedule(
+                hour: time.hour, minutes: time.minute, seconds: 0);
+
+            store.createFeedingSchedule(newData);
           },
-        );
-      }),
+          child: const Icon(
+            Icons.add,
+            color: Colors.red,
+            size: 48.0,
+          )),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (value) => {setState(() => _selectedIndex = value)},
@@ -115,9 +132,21 @@ class FeedingScheduleView extends StatelessWidget {
             ),
           );
         case FutureStatus.rejected:
-          return const Center(
-            child: Text(
-              "Failed to load data. Are your esp32cam turned on?",
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Failed to load data. Are your esp32cam turned on?",
+                ),
+                IconButton(
+                  onPressed: () {
+                    store.getFeedingSchedules();
+                    return;
+                  },
+                  icon: const Icon(Icons.refresh_rounded),
+                )
+              ],
             ),
           );
         case FutureStatus.fulfilled:
@@ -142,31 +171,51 @@ class FeedingScheduleView extends StatelessWidget {
               ),
               const Divider(),
               Expanded(
-                child: ListView.separated(
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: future.result.length,
-                  itemBuilder: (context, index) {
-                    return Dismissible(
-                      key: UniqueKey(),
-                      direction: DismissDirection.endToStart,
-                      onDismissed: (_) {
-                        store.deleteFeedingSchedules(index + 1);
-                      },
-                      child: InkWell(
-                        child: ListTile(
-                          title: Text(
-                            store.timeString(future.result[index]),
-                            style: const TextStyle(
-                                fontSize: 24.0, fontWeight: FontWeight.w400),
-                          ),
-                          trailing: const Icon(Icons.edit),
+                child: RefreshIndicator(
+                  onRefresh: () {
+                    store.getFeedingSchedules();
+
+                    return Future(() => null);
+                  },
+                  child: ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: future.result.length,
+                    itemBuilder: (context, index) {
+                      return Dismissible(
+                        key: UniqueKey(),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          color: Colors.red,
+                          child: const Icon(Icons.delete_forever),
                         ),
-                      ),
-                    );
-                  },
-                  separatorBuilder: (context, index) {
-                    return const Divider();
-                  },
+                        secondaryBackground: Container(
+                          color: Colors.redAccent,
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Icon(Icons.delete_forever, size: 48.0),
+                            ],
+                          ),
+                        ),
+                        onDismissed: (_) {
+                          store.deleteFeedingSchedules(index + 1);
+                        },
+                        child: InkWell(
+                          child: ListTile(
+                            title: Text(
+                              store.timeString(future.result[index]),
+                              style: const TextStyle(
+                                  fontSize: 24.0, fontWeight: FontWeight.w400),
+                            ),
+                            trailing: const Icon(Icons.edit),
+                          ),
+                        ),
+                      );
+                    },
+                    separatorBuilder: (context, index) {
+                      return const Divider();
+                    },
+                  ),
                 ),
               ),
             ],

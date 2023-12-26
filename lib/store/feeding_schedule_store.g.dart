@@ -26,20 +26,24 @@ mixin _$FeedingScheduleStore on _FeedingScheduleStore, Store {
     });
   }
 
-  late final _$isResponseSuccessAtom =
-      Atom(name: '_FeedingScheduleStore.isResponseSuccess', context: context);
+  late final _$createFeedingScheduleAsyncAction = AsyncAction(
+      '_FeedingScheduleStore.createFeedingSchedule',
+      context: context);
 
   @override
-  ObservableFuture<bool>? get isResponseSuccess {
-    _$isResponseSuccessAtom.reportRead();
-    return super.isResponseSuccess;
+  Future<List<FeedingSchedule>> createFeedingSchedule(FeedingSchedule data) {
+    return _$createFeedingScheduleAsyncAction
+        .run(() => super.createFeedingSchedule(data));
   }
 
+  late final _$deleteFeedingSchedulesAsyncAction = AsyncAction(
+      '_FeedingScheduleStore.deleteFeedingSchedules',
+      context: context);
+
   @override
-  set isResponseSuccess(ObservableFuture<bool>? value) {
-    _$isResponseSuccessAtom.reportWrite(value, super.isResponseSuccess, () {
-      super.isResponseSuccess = value;
-    });
+  Future<List<FeedingSchedule>> deleteFeedingSchedules(int index) {
+    return _$deleteFeedingSchedulesAsyncAction
+        .run(() => super.deleteFeedingSchedules(index));
   }
 
   late final _$_FeedingScheduleStoreActionController =
@@ -57,21 +61,9 @@ mixin _$FeedingScheduleStore on _FeedingScheduleStore, Store {
   }
 
   @override
-  Future<List<FeedingSchedule>> deleteFeedingSchedules(int index) {
-    final _$actionInfo = _$_FeedingScheduleStoreActionController.startAction(
-        name: '_FeedingScheduleStore.deleteFeedingSchedules');
-    try {
-      return super.deleteFeedingSchedules(index);
-    } finally {
-      _$_FeedingScheduleStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   String toString() {
     return '''
-feedingSchedulesFuture: ${feedingSchedulesFuture},
-isResponseSuccess: ${isResponseSuccess}
+feedingSchedulesFuture: ${feedingSchedulesFuture}
     ''';
   }
 }

@@ -13,4 +13,10 @@ class FeedingSchedule {
       seconds: json['seconds'] as int,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'hour': hour,
+        'minutes': minutes,
+        'seconds': seconds,
+      };
 }

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:http/http.dart' as http;
 import 'package:pet_bowl_cam_app/model/feeding_schedule.dart';
@@ -21,17 +20,17 @@ class PetBowlCamAPI {
     return body.map((item) => FeedingSchedule.fromJson(item)).toList();
   }
 
-  Future<List<FeedingSchedule>> deleteFeedingSchedule(int index) async {
+  Future<bool> deleteFeedingSchedule(int index) async {
     http.Response res = await http.delete(
         Uri.http(baseURL, "/feeding_schedule", {"id": index.toString()}));
 
-    if (res.statusCode != 200) {
-      log(jsonEncode(res.body));
-      throw "Unable to retrieve feeding schedules";
-    }
+    return res.statusCode == 204;
+  }
 
-    List<dynamic> body = jsonDecode(res.body);
+  Future<bool> createFeedingSchedule(FeedingSchedule data) async {
+    http.Response res = await http.post(Uri.http(baseURL, "/feeding_schedule"),
+        headers: {'Content-Type': 'application/json'}, body: jsonEncode(data));
 
-    return body.map((item) => FeedingSchedule.fromJson(item)).toList();
+    return res.statusCode == 204;
   }
 }
