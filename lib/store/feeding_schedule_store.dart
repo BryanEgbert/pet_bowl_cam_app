@@ -28,6 +28,16 @@ abstract class _FeedingScheduleStore with Store {
   }
 
   @action
+  Future<List<FeedingSchedule>> updateFeedingSchedule(
+      int id, FeedingSchedule data) async {
+    bool success = await _pbcApi.updateFeedingSchedule(id, data);
+
+    feedingSchedulesFuture = ObservableFuture(_pbcApi.getFeedingSchedules());
+
+    return _pbcApi.getFeedingSchedules();
+  }
+
+  @action
   Future<List<FeedingSchedule>> deleteFeedingSchedules(int index) async {
     bool success = await _pbcApi.deleteFeedingSchedule(index);
 

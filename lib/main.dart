@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+// ignore: implementation_imports
 import 'package:mobx/src/api/async.dart';
+import 'package:pet_bowl_cam_app/edit_timezone.dart';
 import 'package:pet_bowl_cam_app/model/feeding_schedule.dart';
+import 'package:pet_bowl_cam_app/model/servo.dart';
+import 'package:pet_bowl_cam_app/model/time_zone.dart';
+import 'package:pet_bowl_cam_app/model/wifi.dart';
 import 'package:pet_bowl_cam_app/store/feeding_schedule_store.dart';
+import 'package:pet_bowl_cam_app/store/settings_store.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,7 +17,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -34,22 +39,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final FeedingScheduleStore store = FeedingScheduleStore();
+  final FeedingScheduleStore feedingScheduleStore = FeedingScheduleStore();
+  final SettingsStore settingsStore = SettingsStore();
 
   int _selectedIndex = 0;
 
   @override
   void initState() {
-    store.getFeedingSchedules();
+    feedingScheduleStore.getFeedingSchedules();
+    settingsStore.initStore();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     List<Widget> widgets = [
-      FeedingScheduleView(store: store),
-      const Center(
-        child: Text("settings"),
+      FeedingScheduleView(store: feedingScheduleStore),
+      SettingsView(
+        settingsStore: settingsStore,
       ),
     ];
 
@@ -82,7 +90,7 @@ class _HomePageState extends State<HomePage> {
             FeedingSchedule newData = FeedingSchedule(
                 hour: time.hour, minutes: time.minute, seconds: 0);
 
-            store.createFeedingSchedule(newData);
+            feedingScheduleStore.createFeedingSchedule(newData);
           },
           child: const Icon(
             Icons.add,
@@ -101,8 +109,134 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.settings),
             label: "Settings",
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.info),
+            label: "Hardware Info",
+          ),
         ],
       ),
+    );
+  }
+}
+
+class SettingsView extends StatelessWidget {
+  const SettingsView({
+    super.key,
+    required this.settingsStore,
+  });
+
+  final SettingsStore settingsStore;
+
+  @override
+  Widget build(BuildContext context) {
+    return Observer(
+      builder: (context) {
+        final wifiFuture = settingsStore.wifiFuture;
+        final timezoneFuture = settingsStore.timezoneFuture;
+        final servoFuture = settingsStore.servoFuture;
+
+        if (settingsStore.isRejected) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Failed to load data. Are your esp32cam turned on?",
+                ),
+                IconButton(
+                  onPressed: () {
+                    settingsStore.initStore();
+                    return;
+                  },
+                  icon: const Icon(Icons.refresh_rounded),
+                )
+              ],
+            ),
+          );
+        } else if (settingsStore.isFulfilled) {
+          WiFi wifiInfo = wifiFuture.result;
+          Timezone timezoneInfo = timezoneFuture.result;
+          Servo servoInfo = servoFuture.result;
+
+          return ListView.custom(
+            physics: const NeverScrollableScrollPhysics(),
+            childrenDelegate: SliverChildListDelegate([
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditTimezoneView(
+                        store: settingsStore,
+                        currentTimezone: timezoneInfo.tz,
+                      ),
+                    ),
+                  );
+                },
+                child: ListTile(
+                  title: const Text("Timezone"),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(timezoneInfo.tz),
+                  ),
+                ),
+              ),
+              const Divider(
+                thickness: 0,
+              ),
+              ListTile(
+                title: const Text("WiFi"),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    // mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("SSID: ${wifiInfo.ssid}"),
+                      Text("IP Address: ${wifiInfo.ipAddress}"),
+                      Text("DNS: ${wifiInfo.dns}"),
+                      Text("Subnet: ${wifiInfo.subnetMask}"),
+                      Text("MAC Address: ${wifiInfo.mac}"),
+                    ],
+                  ),
+                ),
+              ),
+              const Divider(
+                thickness: 0,
+              ),
+              ListTile(
+                title: const Text("Configure Servo"),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    // mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                          "Should open on request timeout: ${servoInfo.openOnTimeout}"),
+                      Text(
+                          "Servo Open Duration (ms): ${servoInfo.servoOpenMs}"),
+                    ],
+                  ),
+                ),
+              ),
+              const ListTile(
+                title: Text("Configure NTP Server"),
+              ),
+            ]),
+          );
+        } else {
+          return const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator.adaptive(),
+                Text("Fetching data..."),
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 }
@@ -150,6 +284,7 @@ class FeedingScheduleView extends StatelessWidget {
             ),
           );
         case FutureStatus.fulfilled:
+          List<FeedingSchedule> feedingSchedules = future.result;
           return Column(
             children: [
               Padding(
@@ -162,7 +297,7 @@ class FeedingScheduleView extends StatelessWidget {
                       style: TextStyle(fontSize: 24),
                     ),
                     Text(
-                      "${future.result.length}/5",
+                      "${feedingSchedules.length}/5",
                       style: const TextStyle(
                           fontSize: 24, fontWeight: FontWeight.bold),
                     ),
@@ -179,7 +314,7 @@ class FeedingScheduleView extends StatelessWidget {
                   },
                   child: ListView.separated(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: future.result.length,
+                    itemCount: feedingSchedules.length,
                     itemBuilder: (context, index) {
                       return Dismissible(
                         key: UniqueKey(),
@@ -203,12 +338,37 @@ class FeedingScheduleView extends StatelessWidget {
                         child: InkWell(
                           child: ListTile(
                             title: Text(
-                              store.timeString(future.result[index]),
+                              store.timeString(feedingSchedules[index]),
                               style: const TextStyle(
                                   fontSize: 24.0, fontWeight: FontWeight.w400),
                             ),
                             trailing: const Icon(Icons.edit),
                           ),
+                          onTap: () async {
+                            final TimeOfDay? time = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay(
+                                  hour: feedingSchedules[index].hour,
+                                  minute: feedingSchedules[index].minutes),
+                              orientation: Orientation.portrait,
+                              builder: (context, child) {
+                                return MediaQuery(
+                                  data: MediaQuery.of(context)
+                                      .copyWith(alwaysUse24HourFormat: true),
+                                  child: child!,
+                                );
+                              },
+                            );
+
+                            if (time == null) return;
+
+                            store.updateFeedingSchedule(
+                                index + 1,
+                                FeedingSchedule(
+                                    hour: time.hour,
+                                    minutes: time.minute,
+                                    seconds: 0));
+                          },
                         ),
                       );
                     },

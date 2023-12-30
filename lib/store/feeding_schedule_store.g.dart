@@ -36,6 +36,17 @@ mixin _$FeedingScheduleStore on _FeedingScheduleStore, Store {
         .run(() => super.createFeedingSchedule(data));
   }
 
+  late final _$updateFeedingScheduleAsyncAction = AsyncAction(
+      '_FeedingScheduleStore.updateFeedingSchedule',
+      context: context);
+
+  @override
+  Future<List<FeedingSchedule>> updateFeedingSchedule(
+      int id, FeedingSchedule data) {
+    return _$updateFeedingScheduleAsyncAction
+        .run(() => super.updateFeedingSchedule(id, data));
+  }
+
   late final _$deleteFeedingSchedulesAsyncAction = AsyncAction(
       '_FeedingScheduleStore.deleteFeedingSchedules',
       context: context);
