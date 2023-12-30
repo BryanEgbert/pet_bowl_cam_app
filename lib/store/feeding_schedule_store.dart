@@ -20,7 +20,7 @@ abstract class _FeedingScheduleStore with Store {
   @action
   Future<List<FeedingSchedule>> createFeedingSchedule(
       FeedingSchedule data) async {
-    bool success = await _pbcApi.createFeedingSchedule(data);
+    await _pbcApi.createFeedingSchedule(data);
 
     feedingSchedulesFuture = ObservableFuture(_pbcApi.getFeedingSchedules());
 
@@ -30,7 +30,7 @@ abstract class _FeedingScheduleStore with Store {
   @action
   Future<List<FeedingSchedule>> updateFeedingSchedule(
       int id, FeedingSchedule data) async {
-    bool success = await _pbcApi.updateFeedingSchedule(id, data);
+    await _pbcApi.updateFeedingSchedule(id, data);
 
     feedingSchedulesFuture = ObservableFuture(_pbcApi.getFeedingSchedules());
 
@@ -39,7 +39,7 @@ abstract class _FeedingScheduleStore with Store {
 
   @action
   Future<List<FeedingSchedule>> deleteFeedingSchedules(int index) async {
-    bool success = await _pbcApi.deleteFeedingSchedule(index);
+    await _pbcApi.deleteFeedingSchedule(index);
 
     feedingSchedulesFuture = ObservableFuture(_pbcApi.getFeedingSchedules());
 

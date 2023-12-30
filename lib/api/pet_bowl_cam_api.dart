@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:pet_bowl_cam_app/model/feeding_schedule.dart';
+import 'package:pet_bowl_cam_app/model/hardware.dart';
 import 'package:pet_bowl_cam_app/model/servo.dart';
 import 'package:pet_bowl_cam_app/model/time_server.dart';
 import 'package:pet_bowl_cam_app/model/time_zone.dart';
@@ -17,7 +18,7 @@ class PetBowlCamAPI {
     http.Response res = await http.get(Uri.http(baseURL, "/feeding_schedule"));
 
     if (res.statusCode != 200) {
-      throw "Unable to retrieve feeding schedules";
+      throw HttpException(jsonDecode(res.body)['message']);
     }
 
     List<dynamic> body = jsonDecode(res.body);
@@ -29,7 +30,11 @@ class PetBowlCamAPI {
     http.Response res = await http.post(Uri.http(baseURL, "/feeding_schedule"),
         headers: {'Content-Type': 'application/json'}, body: jsonEncode(data));
 
-    return res.statusCode == 204;
+    if (res.statusCode != 204) {
+      throw HttpException(jsonDecode(res.body)['message']);
+    }
+
+    return true;
   }
 
   Future<bool> updateFeedingSchedule(int id, FeedingSchedule data) async {
@@ -46,14 +51,18 @@ class PetBowlCamAPI {
     http.Response res = await http.delete(
         Uri.http(baseURL, "/feeding_schedule", {"id": index.toString()}));
 
-    return res.statusCode == 204;
+    if (res.statusCode != 204) {
+      throw HttpException(jsonDecode(res.body)['message']);
+    }
+
+    return true;
   }
 
   Future<WiFi> getConnectedWiFi() async {
     http.Response res = await http.get(Uri.http(baseURL, "/wifi"));
 
     if (res.statusCode != 200) {
-      throw "Unable to retrieve wifi data";
+      throw HttpException(jsonDecode(res.body)['message']);
     }
 
     Map<String, dynamic> body = jsonDecode(res.body);
@@ -69,14 +78,18 @@ class PetBowlCamAPI {
       'password': password
     });
 
-    return res.statusCode == 204;
+    if (res.statusCode != 204) {
+      throw HttpException(jsonDecode(res.body)['message']);
+    }
+
+    return true;
   }
 
   Future<Timezone> getTimeZone() async {
     http.Response res = await http.get(Uri.http(baseURL, "/tz"));
 
     if (res.statusCode != 200) {
-      throw "Unable to retrieve timezone data";
+      throw HttpException(jsonDecode(res.body)['message']);
     }
 
     Map<String, dynamic> body = jsonDecode(res.body);
@@ -88,14 +101,18 @@ class PetBowlCamAPI {
     http.Response res =
         await http.post(Uri.http(baseURL, "/tz"), body: {'tz': tz});
 
-    return res.statusCode == 204;
+    if (res.statusCode != 204) {
+      throw HttpException(jsonDecode(res.body)['message']);
+    }
+
+    return true;
   }
 
   Future<Servo> getServoConfig() async {
     http.Response res = await http.get(Uri.http(baseURL, "/servo"));
 
     if (res.statusCode != 200) {
-      throw "Unabled to retrieve timezone data";
+      throw HttpException(jsonDecode(res.body)['message']);
     }
 
     Map<String, dynamic> body = jsonDecode(res.body);
@@ -103,13 +120,55 @@ class PetBowlCamAPI {
     return Servo.fromJson(body);
   }
 
+  Future<bool> updateServoConfig(
+      bool shouldOpenIfTimeout, int servoOpenMs) async {
+    http.Response res = await http.post(Uri.http(baseURL, "/servo"), headers: {
+      HttpHeaders.contentTypeHeader: 'application/x-www-form-urlencoded',
+    }, body: {
+      'shouldOpenIfTimeout': shouldOpenIfTimeout.toString(),
+      'servoOpenMs': servoOpenMs,
+    });
+
+    if (res.statusCode != 204) {
+      throw HttpException(jsonDecode(res.body)['message']);
+    }
+
+    return true;
+  }
+
   Future<TimeServer> getTimeServers() async {
     http.Response res = await http.get(Uri.http(baseURL, "/time-server"));
 
     if (res.statusCode != 200) {
-      throw "Unabled to retrieve time server data";
+      throw HttpException(jsonDecode(res.body)['message']);
     }
 
     return TimeServer.fromJson(jsonDecode(res.body));
+  }
+
+  Future<bool> updateTimeServer(int index, String url) async {
+    http.Response res =
+        await http.post(Uri.http(baseURL, "/time-server"), headers: {
+      HttpHeaders.contentTypeHeader: 'application/x-www-form-urlencoded',
+    }, body: {
+      'index': index,
+      'url': url,
+    });
+
+    if (res.statusCode != 204) {
+      throw HttpException(jsonDecode(res.body)['message']);
+    }
+
+    return true;
+  }
+
+  Future<Hardware> getHardwareInfo() async {
+    http.Response res = await http.get(Uri.http(baseURL, "/hardware"));
+
+    if (res.statusCode != 200) {
+      throw HttpException(jsonDecode(res.body)['message']);
+    }
+
+    return Hardware.fromJson(jsonDecode(res.body));
   }
 }
