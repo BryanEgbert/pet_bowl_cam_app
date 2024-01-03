@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:mobx/mobx.dart';
 // ignore: implementation_imports
 import 'package:mobx/src/api/async.dart';
+import 'package:pet_bowl_cam_app/edit_servo.dart';
+import 'package:pet_bowl_cam_app/edit_time_server.dart';
 import 'package:pet_bowl_cam_app/edit_timezone.dart';
+import 'package:pet_bowl_cam_app/hardware_info.dart';
 import 'package:pet_bowl_cam_app/model/feeding_schedule.dart';
+import 'package:pet_bowl_cam_app/model/hardware.dart';
 import 'package:pet_bowl_cam_app/model/servo.dart';
+import 'package:pet_bowl_cam_app/model/time_server.dart';
 import 'package:pet_bowl_cam_app/model/time_zone.dart';
 import 'package:pet_bowl_cam_app/model/wifi.dart';
 import 'package:pet_bowl_cam_app/store/feeding_schedule_store.dart';
@@ -32,7 +38,9 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, this.selectedIndex = 0});
+
+  final int selectedIndex;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -48,6 +56,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     feedingScheduleStore.getFeedingSchedules();
     settingsStore.initStore();
+    _selectedIndex = widget.selectedIndex;
 
     super.initState();
   }
@@ -99,7 +108,9 @@ class _HomePageState extends State<HomePage> {
           )),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: (value) => {setState(() => _selectedIndex = value)},
+        onTap: (value) {
+          setState(() => _selectedIndex = value);
+        },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
@@ -108,10 +119,6 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: "Settings",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.info),
-            label: "Hardware Info",
           ),
         ],
       ),
@@ -134,14 +141,16 @@ class SettingsView extends StatelessWidget {
         final wifiFuture = settingsStore.wifiFuture;
         final timezoneFuture = settingsStore.timezoneFuture;
         final servoFuture = settingsStore.servoFuture;
+        final hardwareInfoFuture = settingsStore.hardwareInfoFuture;
+        final timeServerFuture = settingsStore.timeServerFuture;
 
         if (settingsStore.isRejected) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  "Failed to load data. Are your esp32cam turned on?",
+                Text(
+                  "Failed to load data.\nReason: ${wifiFuture.error}",
                 ),
                 IconButton(
                   onPressed: () {
@@ -157,11 +166,19 @@ class SettingsView extends StatelessWidget {
           WiFi wifiInfo = wifiFuture.result;
           Timezone timezoneInfo = timezoneFuture.result;
           Servo servoInfo = servoFuture.result;
+          Hardware hardwareInfo = hardwareInfoFuture.result;
+          TimeServer timeServerInfo = timeServerFuture.result;
 
           return ListView.custom(
             physics: const NeverScrollableScrollPhysics(),
             childrenDelegate: SliverChildListDelegate([
-              InkWell(
+              ListTile(
+                leading: const Icon(Icons.location_on_outlined),
+                title: const Text("Timezone"),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Text(timezoneInfo.tz),
+                ),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -173,18 +190,10 @@ class SettingsView extends StatelessWidget {
                     ),
                   );
                 },
-                child: ListTile(
-                  title: const Text("Timezone"),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Text(timezoneInfo.tz),
-                  ),
-                ),
               ),
-              const Divider(
-                thickness: 0,
-              ),
+              const Divider(thickness: 0),
               ListTile(
+                leading: const Icon(Icons.wifi),
                 title: const Text("WiFi"),
                 subtitle: Padding(
                   padding: const EdgeInsets.only(left: 8.0),
@@ -201,10 +210,9 @@ class SettingsView extends StatelessWidget {
                   ),
                 ),
               ),
-              const Divider(
-                thickness: 0,
-              ),
+              const Divider(thickness: 0),
               ListTile(
+                leading: const Icon(Icons.rotate_90_degrees_cw_outlined),
                 title: const Text("Configure Servo"),
                 subtitle: Padding(
                   padding: const EdgeInsets.only(left: 8.0),
@@ -219,9 +227,57 @@ class SettingsView extends StatelessWidget {
                     ],
                   ),
                 ),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditServoView(
+                            store: settingsStore, initialInfo: servoInfo),
+                      ));
+                },
               ),
-              const ListTile(
-                title: Text("Configure NTP Server"),
+              const Divider(thickness: 0),
+              ListTile(
+                leading: const Icon(Icons.access_time_outlined),
+                title: const Text("Configure NTP Server"),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    // mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text("url 1: ${timeServerInfo.timeServer1}"),
+                      Text("url 2: ${timeServerInfo.timeServer2}"),
+                      Text("url 3: ${timeServerInfo.timeServer3}"),
+                    ],
+                  ),
+                ),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditTimeServerView(
+                            timeServer1: timeServerInfo.timeServer1,
+                            timeServer2: timeServerInfo.timeServer2,
+                            timeServer3: timeServerInfo.timeServer3,
+                            store: settingsStore),
+                      ));
+                },
+              ),
+              const Divider(thickness: 0),
+              ListTile(
+                leading: const Icon(Icons.info_outline_rounded),
+                title: const Text("Hardware Info"),
+                subtitle:
+                    const Text("Get Information about the Pet Bowl Feeder"),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            HardwareInfoView(hardwareInfo: hardwareInfo),
+                      ));
+                },
               ),
             ]),
           );
@@ -271,8 +327,9 @@ class FeedingScheduleView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  "Failed to load data. Are your esp32cam turned on?",
+                  "Failed to load data",
                 ),
+                Text("Reason: ${future.error.message}"),
                 IconButton(
                   onPressed: () {
                     store.getFeedingSchedules();

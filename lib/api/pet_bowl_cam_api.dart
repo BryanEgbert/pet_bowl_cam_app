@@ -126,7 +126,7 @@ class PetBowlCamAPI {
       HttpHeaders.contentTypeHeader: 'application/x-www-form-urlencoded',
     }, body: {
       'shouldOpenIfTimeout': shouldOpenIfTimeout.toString(),
-      'servoOpenMs': servoOpenMs,
+      'servoOpenMs': servoOpenMs.toString(),
     });
 
     if (res.statusCode != 204) {
@@ -146,13 +146,14 @@ class PetBowlCamAPI {
     return TimeServer.fromJson(jsonDecode(res.body));
   }
 
-  Future<bool> updateTimeServer(int index, String url) async {
+  Future<bool> updateTimeServer(String url1, String url2, String url3) async {
     http.Response res =
         await http.post(Uri.http(baseURL, "/time-server"), headers: {
       HttpHeaders.contentTypeHeader: 'application/x-www-form-urlencoded',
     }, body: {
-      'index': index,
-      'url': url,
+      'timeServerUrl1': url1,
+      'timeServerUrl2': url2,
+      'timeServerUrl3': url3,
     });
 
     if (res.statusCode != 204) {
