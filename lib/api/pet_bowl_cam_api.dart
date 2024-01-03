@@ -172,4 +172,20 @@ class PetBowlCamAPI {
 
     return Hardware.fromJson(jsonDecode(res.body));
   }
+
+  Future<bool> openServo() async {
+    http.Response res = await http.post(Uri.http(baseURL, "/servo/open"));
+
+    if (res.statusCode != 202) {
+      throw HttpException(jsonDecode(res.body)['message']);
+    }
+
+    return true;
+  }
+
+  Future<bool> resetBoard() async {
+    http.Response res = await http.post(Uri.http(baseURL, "/servo/open"));
+
+    return res.statusCode == 204;
+  }
 }
