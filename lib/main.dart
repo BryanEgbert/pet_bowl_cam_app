@@ -75,6 +75,14 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text("PetBowlCam App"),
         backgroundColor: Colors.amberAccent,
+        actions: [
+          IconButton(
+              onPressed: () => setState(() {
+                    feedingScheduleStore.getFeedingSchedules();
+                    settingsStore.initStore();
+                  }),
+              icon: const Icon(Icons.refresh_rounded))
+        ],
       ),
       body: SafeArea(child: widgets[_selectedIndex]),
       floatingActionButton: FloatingActionButton.large(
