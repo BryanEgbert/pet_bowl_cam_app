@@ -6,6 +6,7 @@ import 'package:mobx/src/api/async.dart';
 import 'package:pet_bowl_cam_app/edit_servo.dart';
 import 'package:pet_bowl_cam_app/edit_time_server.dart';
 import 'package:pet_bowl_cam_app/edit_timezone.dart';
+import 'package:pet_bowl_cam_app/edit_wifi.dart';
 import 'package:pet_bowl_cam_app/hardware_info.dart';
 import 'package:pet_bowl_cam_app/model/feeding_schedule.dart';
 import 'package:pet_bowl_cam_app/model/hardware.dart';
@@ -207,6 +208,13 @@ class SettingsView extends StatelessWidget {
                       Text("Subnet: ${wifiInfo.subnetMask}"),
                       Text("MAC Address: ${wifiInfo.mac}"),
                     ],
+                  ),
+                ),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditWiFiView(
+                        store: settingsStore, initialValue: wifiInfo),
                   ),
                 ),
               ),

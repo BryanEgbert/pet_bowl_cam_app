@@ -46,25 +46,30 @@ class EditTimeServerView extends StatelessWidget {
                 controller: thirdTimeServerController,
                 decoration: const InputDecoration(labelText: "Time server 3"),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: ElevatedButton(
-                    onPressed: () {
-                      store.updateTimeServer(
-                          firstTimeServerController.value.text,
-                          secondTimeServerController.value.text,
-                          thirdTimeServerController.value.text);
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: ElevatedButton(
+                        onPressed: () {
+                          store.updateTimeServer(
+                              firstTimeServerController.value.text,
+                              secondTimeServerController.value.text,
+                              thirdTimeServerController.value.text);
 
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const HomePage(
-                            selectedIndex: 1,
-                          ),
-                        ),
-                      );
-                    },
-                    child: const Text("Save/Resubmit")),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HomePage(
+                                selectedIndex: 1,
+                              ),
+                            ),
+                          );
+                        },
+                        child: const Text("Save/Resubmit")),
+                  ),
+                ],
               )
             ],
           ),
