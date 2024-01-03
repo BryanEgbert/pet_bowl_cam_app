@@ -295,6 +295,47 @@ class SettingsView extends StatelessWidget {
                       ));
                 },
               ),
+              const Divider(thickness: 0),
+              ListTile(
+                leading: const Icon(Icons.rotate_left_rounded),
+                title: const Text("Open Servo"),
+                tileColor: Colors.blueAccent,
+                onTap: () {
+                  settingsStore.openServo();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.warning_amber_rounded),
+                title: const Text("Reset board"),
+                tileColor: Colors.redAccent,
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text("Reset Board?"),
+                        content: const Text(
+                            "Resetting board may lead to board unable to correctly connect to WiFi and time server. Are you sure?"),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              settingsStore.resetBoard();
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Yes"),
+                          ),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text("No"))
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
             ]),
           );
         } else {

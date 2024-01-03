@@ -80,6 +80,16 @@ abstract class _SettingsStore with Store {
   Future<Hardware> getHardwareInfo() =>
       hardwareInfoFuture = ObservableFuture(_pbcApi.getHardwareInfo());
 
+  @action
+  Future<void> openServo() async {
+    bool success = await _pbcApi.openServo();
+  }
+
+  @action
+  Future<void> resetBoard() async {
+    bool success = await _pbcApi.resetBoard();
+  }
+
   @computed
   bool get isPending =>
       wifiFuture.status == FutureStatus.pending &&

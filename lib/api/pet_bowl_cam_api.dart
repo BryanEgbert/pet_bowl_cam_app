@@ -184,7 +184,7 @@ class PetBowlCamAPI {
   }
 
   Future<bool> resetBoard() async {
-    http.Response res = await http.post(Uri.http(baseURL, "/servo/open"));
+    http.Response res = await http.post(Uri.http(baseURL, "/reset"));
 
     return res.statusCode == 204;
   }
