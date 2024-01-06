@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pet_bowl_cam_app/main.dart';
-import 'package:pet_bowl_cam_app/store/settings_store.dart';
+import 'package:pet_bowl_cam_app/store/pet_bowl_cam_api_store.dart';
 
 class EditTimeServerView extends StatelessWidget {
   const EditTimeServerView(
@@ -14,7 +14,7 @@ class EditTimeServerView extends StatelessWidget {
   final String timeServer2;
   final String timeServer3;
 
-  final SettingsStore store;
+  final PetBowlCamAPIStore store;
 
   @override
   Widget build(BuildContext context) {

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:pet_bowl_cam_app/main.dart';
 import 'package:pet_bowl_cam_app/model/servo.dart';
-import 'package:pet_bowl_cam_app/store/settings_store.dart';
+import 'package:pet_bowl_cam_app/store/pet_bowl_cam_api_store.dart';
 
 class EditServoView extends StatefulWidget {
   const EditServoView(
       {super.key, required this.store, required this.initialInfo});
 
-  final SettingsStore store;
+  final PetBowlCamAPIStore store;
   final Servo initialInfo;
 
   @override

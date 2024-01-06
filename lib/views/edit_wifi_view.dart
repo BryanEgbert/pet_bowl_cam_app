@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:pet_bowl_cam_app/main.dart';
 import 'package:pet_bowl_cam_app/model/wifi.dart';
-import 'package:pet_bowl_cam_app/store/settings_store.dart';
+import 'package:pet_bowl_cam_app/store/pet_bowl_cam_api_store.dart';
 
 class EditWiFiView extends StatelessWidget {
   const EditWiFiView(
       {super.key, required this.store, required this.initialValue});
 
-  final SettingsStore store;
+  final PetBowlCamAPIStore store;
   final WiFi initialValue;
 
   @override

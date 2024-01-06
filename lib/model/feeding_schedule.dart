@@ -19,4 +19,7 @@ class FeedingSchedule {
         'minutes': minutes,
         'seconds': seconds,
       };
+
+  @override
+  String toString() => "$hour:$minutes";
 }

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:pet_bowl_cam_app/model/hardware.dart';
+import 'package:pet_bowl_cam_app/model/server_url.dart';
 import 'package:pet_bowl_cam_app/model/servo.dart';
 import 'package:pet_bowl_cam_app/model/time_server.dart';
 import 'package:pet_bowl_cam_app/model/time_zone.dart';
 import 'package:pet_bowl_cam_app/model/wifi.dart';
-import 'package:pet_bowl_cam_app/store/settings_store.dart';
+import 'package:pet_bowl_cam_app/store/pet_bowl_cam_api_store.dart';
+import 'package:pet_bowl_cam_app/views/edit_server_url_view.dart';
 import 'package:pet_bowl_cam_app/views/edit_servo_view.dart';
 import 'package:pet_bowl_cam_app/views/edit_time_server_view.dart';
 import 'package:pet_bowl_cam_app/views/edit_timezone_view.dart';
@@ -15,22 +17,23 @@ import 'package:pet_bowl_cam_app/views/hardware_info_view.dart';
 class SettingsView extends StatelessWidget {
   const SettingsView({
     super.key,
-    required this.settingsStore,
+    required this.store,
   });
 
-  final SettingsStore settingsStore;
+  final PetBowlCamAPIStore store;
 
   @override
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) {
-        final wifiFuture = settingsStore.wifiFuture;
-        final timezoneFuture = settingsStore.timezoneFuture;
-        final servoFuture = settingsStore.servoFuture;
-        final hardwareInfoFuture = settingsStore.hardwareInfoFuture;
-        final timeServerFuture = settingsStore.timeServerFuture;
+        final wifiFuture = store.wifiFuture;
+        final timezoneFuture = store.timezoneFuture;
+        final servoFuture = store.servoFuture;
+        final hardwareInfoFuture = store.hardwareInfoFuture;
+        final timeServerFuture = store.timeServerFuture;
+        final serverUrlFuture = store.serverUrlFuture;
 
-        if (settingsStore.isRejected) {
+        if (store.isRejected) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -40,7 +43,7 @@ class SettingsView extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () {
-                    settingsStore.initStore();
+                    store.initStore();
                     return;
                   },
                   icon: const Icon(Icons.refresh_rounded),
@@ -48,16 +51,34 @@ class SettingsView extends StatelessWidget {
               ],
             ),
           );
-        } else if (settingsStore.isFulfilled) {
+        } else if (store.isFulfilled) {
           WiFi wifiInfo = wifiFuture.result;
           Timezone timezoneInfo = timezoneFuture.result;
           Servo servoInfo = servoFuture.result;
           Hardware hardwareInfo = hardwareInfoFuture.result;
           TimeServer timeServerInfo = timeServerFuture.result;
+          ServerUrl serverUrlInfo = serverUrlFuture.result;
 
           return ListView.custom(
             physics: const NeverScrollableScrollPhysics(),
             childrenDelegate: SliverChildListDelegate([
+              ListTile(
+                leading: const Icon(Icons.link),
+                title: const Text("Server URL"),
+                subtitle: const Text("Configure server URL"),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditServerUrlView(
+                        initialInfo: serverUrlInfo,
+                        store: store,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const Divider(thickness: 0),
               ListTile(
                 leading: const Icon(Icons.location_on_outlined),
                 title: const Text("Timezone"),
@@ -70,7 +91,7 @@ class SettingsView extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => EditTimezoneView(
-                        store: settingsStore,
+                        store: store,
                         currentTimezone: timezoneInfo.tz,
                       ),
                     ),
@@ -98,8 +119,8 @@ class SettingsView extends StatelessWidget {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EditWiFiView(
-                        store: settingsStore, initialValue: wifiInfo),
+                    builder: (context) =>
+                        EditWiFiView(store: store, initialValue: wifiInfo),
                   ),
                 ),
               ),
@@ -124,8 +145,8 @@ class SettingsView extends StatelessWidget {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => EditServoView(
-                            store: settingsStore, initialInfo: servoInfo),
+                        builder: (context) =>
+                            EditServoView(store: store, initialInfo: servoInfo),
                       ));
                 },
               ),
@@ -153,7 +174,7 @@ class SettingsView extends StatelessWidget {
                             timeServer1: timeServerInfo.timeServer1,
                             timeServer2: timeServerInfo.timeServer2,
                             timeServer3: timeServerInfo.timeServer3,
-                            store: settingsStore),
+                            store: store),
                       ));
                 },
               ),
@@ -178,7 +199,7 @@ class SettingsView extends StatelessWidget {
                 title: const Text("Open Servo"),
                 tileColor: Colors.blueAccent,
                 onTap: () {
-                  settingsStore.openServo();
+                  store.openServo();
                 },
               ),
               ListTile(
@@ -197,7 +218,7 @@ class SettingsView extends StatelessWidget {
                         actions: [
                           TextButton(
                             onPressed: () {
-                              settingsStore.resetBoard();
+                              store.resetBoard();
                               Navigator.pop(context);
                             },
                             child: const Text("Yes"),

@@ -10,9 +10,13 @@ import 'package:pet_bowl_cam_app/model/time_zone.dart';
 import 'package:pet_bowl_cam_app/model/wifi.dart';
 
 class PetBowlCamAPI {
-  final String baseURL;
+  String baseURL;
 
   PetBowlCamAPI({this.baseURL = "192.168.4.1"});
+
+  void setBaseURL(String url) {
+    baseURL = url;
+  }
 
   Future<List<FeedingSchedule>> getFeedingSchedules() async {
     http.Response res = await http.get(Uri.http(baseURL, "/feeding_schedule"));

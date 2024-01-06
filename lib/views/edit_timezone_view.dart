@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pet_bowl_cam_app/store/settings_store.dart';
+import 'package:pet_bowl_cam_app/store/pet_bowl_cam_api_store.dart';
 
 final Map<String, String> timezones = {
   "Africa/Abidjan": "GMT0",
@@ -470,7 +470,7 @@ class EditTimezoneView extends StatefulWidget {
       {super.key, required this.store, this.currentTimezone = ""});
 
   final String currentTimezone;
-  final SettingsStore store;
+  final PetBowlCamAPIStore store;
 
   @override
   State<EditTimezoneView> createState() => _EditTimezoneViewState();

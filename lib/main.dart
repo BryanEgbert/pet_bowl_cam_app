@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 // ignore: implementation_imports
 import 'package:pet_bowl_cam_app/model/feeding_schedule.dart';
 import 'package:pet_bowl_cam_app/views/feeding_schedule_view.dart';
-import 'package:pet_bowl_cam_app/store/feeding_schedule_store.dart';
-import 'package:pet_bowl_cam_app/store/settings_store.dart';
+import 'package:pet_bowl_cam_app/store/pet_bowl_cam_api_store.dart';
 import 'package:pet_bowl_cam_app/views/settings_view.dart';
+
+// @pragma('vm:entry-point')
+// void callbackDispatcher() {}
 
 void main() {
   runApp(const MyApp());
@@ -37,15 +39,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final FeedingScheduleStore feedingScheduleStore = FeedingScheduleStore();
-  final SettingsStore settingsStore = SettingsStore();
+  final PetBowlCamAPIStore petBowlCamApiStore = PetBowlCamAPIStore();
 
   int _selectedIndex = 0;
 
   @override
   void initState() {
-    feedingScheduleStore.getFeedingSchedules();
-    settingsStore.initStore();
+    petBowlCamApiStore.initStore();
+
     _selectedIndex = widget.selectedIndex;
 
     super.initState();
@@ -54,9 +55,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> widgets = [
-      FeedingScheduleView(store: feedingScheduleStore),
+      FeedingScheduleView(store: petBowlCamApiStore),
       SettingsView(
-        settingsStore: settingsStore,
+        store: petBowlCamApiStore,
       ),
     ];
 
@@ -67,8 +68,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
               onPressed: () => setState(() {
-                    feedingScheduleStore.getFeedingSchedules();
-                    settingsStore.initStore();
+                    petBowlCamApiStore.initStore();
                   }),
               icon: const Icon(Icons.refresh_rounded))
         ],
@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
             FeedingSchedule newData = FeedingSchedule(
                 hour: time.hour, minutes: time.minute, seconds: 0);
 
-            feedingScheduleStore.createFeedingSchedule(newData);
+            petBowlCamApiStore.createFeedingSchedule(newData);
           },
           child: const Icon(
             Icons.add,
