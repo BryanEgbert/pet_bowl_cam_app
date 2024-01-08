@@ -17,46 +17,52 @@ class EditWiFiView extends StatelessWidget {
     final TextEditingController passwordEditController =
         TextEditingController(text: initialValue.password);
 
-    return Material(
-      child: SafeArea(
-          child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: ssidEditController,
-              decoration: const InputDecoration(labelText: "SSID"),
-            ),
-            TextField(
-              controller: passwordEditController,
-              decoration: const InputDecoration(labelText: "Password"),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: ElevatedButton(
-                      onPressed: () {
-                        store.updateWiFi(ssidEditController.value.text,
-                            passwordEditController.value.text);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("PetBowlCam App"),
+        backgroundColor: Colors.amberAccent,
+      ),
+      body: Material(
+        child: SafeArea(
+            child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              TextField(
+                controller: ssidEditController,
+                decoration: const InputDecoration(labelText: "SSID"),
+              ),
+              TextField(
+                controller: passwordEditController,
+                decoration: const InputDecoration(labelText: "Password"),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: ElevatedButton(
+                        onPressed: () {
+                          store.updateWiFi(ssidEditController.value.text,
+                              passwordEditController.value.text);
 
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const HomePage(
-                              selectedIndex: 1,
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HomePage(
+                                selectedIndex: 1,
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                      child: const Text("Save")),
-                ),
-              ],
-            ),
-          ],
-        ),
-      )),
+                          );
+                        },
+                        child: const Text("Save")),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        )),
+      ),
     );
   }
 }

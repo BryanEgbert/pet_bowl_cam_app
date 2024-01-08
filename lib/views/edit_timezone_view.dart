@@ -482,67 +482,74 @@ class _EditTimezoneViewState extends State<EditTimezoneView> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              TextField(
-                onChanged: (value) {
-                  searchedTimezones.clear();
-                  for (MapEntry<String, String> e in timezones.entries) {
-                    if (e.key.contains(value) || e.value.contains(value)) {
-                      setState(() {
-                        searchedTimezones.addAll({e.key: e.value});
-                      });
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("PetBowlCam App"),
+        backgroundColor: Colors.amberAccent,
+      ),
+      body: Material(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                TextField(
+                  onChanged: (value) {
+                    searchedTimezones.clear();
+                    for (MapEntry<String, String> e in timezones.entries) {
+                      if (e.key.contains(value) || e.value.contains(value)) {
+                        setState(() {
+                          searchedTimezones.addAll({e.key: e.value});
+                        });
+                      }
                     }
-                  }
-                },
-                decoration: InputDecoration(
-                    hintText: widget.currentTimezone == ""
-                        ? "Etc/Universal"
-                        : timezones.keys.firstWhere(
-                            (element) =>
-                                timezones[element] == widget.currentTimezone,
-                            orElse: () => "Etc/Universal"),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    )),
-              ),
-              Expanded(
-                child: ListView.separated(
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text((searchedTimezones.isEmpty)
-                          ? timezones.keys.toList(growable: false)[index]
-                          : searchedTimezones.keys
-                              .toList(growable: false)[index]),
-                      subtitle: Text((searchedTimezones.isEmpty)
-                          ? timezones.values.toList()[index]
-                          : searchedTimezones.values
-                              .toList(growable: false)[index]),
-                      onTap: () {
-                        widget.store.updateTimeZone((searchedTimezones.isEmpty)
-                            ? timezones.values.toList(growable: false)[index]
-                            : searchedTimezones.values
-                                .toList(growable: false)[index]);
-                        Navigator.pop(context);
-                      },
-                    );
                   },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return const Divider();
-                  },
-                  itemCount: (searchedTimezones.isEmpty)
-                      ? timezones.length
-                      : searchedTimezones.length,
+                  decoration: InputDecoration(
+                      hintText: widget.currentTimezone == ""
+                          ? "Etc/Universal"
+                          : timezones.keys.firstWhere(
+                              (element) =>
+                                  timezones[element] == widget.currentTimezone,
+                              orElse: () => "Etc/Universal"),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      )),
                 ),
-                // child: TimezoneListView(
-                //   searchedTimezones: searchedTimezones,
-                // ),
-              ),
-            ],
+                Expanded(
+                  child: ListView.separated(
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text((searchedTimezones.isEmpty)
+                            ? timezones.keys.toList(growable: false)[index]
+                            : searchedTimezones.keys
+                                .toList(growable: false)[index]),
+                        subtitle: Text((searchedTimezones.isEmpty)
+                            ? timezones.values.toList()[index]
+                            : searchedTimezones.values
+                                .toList(growable: false)[index]),
+                        onTap: () {
+                          widget.store.updateTimeZone((searchedTimezones
+                                  .isEmpty)
+                              ? timezones.values.toList(growable: false)[index]
+                              : searchedTimezones.values
+                                  .toList(growable: false)[index]);
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return const Divider();
+                    },
+                    itemCount: (searchedTimezones.isEmpty)
+                        ? timezones.length
+                        : searchedTimezones.length,
+                  ),
+                  // child: TimezoneListView(
+                  //   searchedTimezones: searchedTimezones,
+                  // ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

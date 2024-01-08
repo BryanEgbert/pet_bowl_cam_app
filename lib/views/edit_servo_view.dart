@@ -28,45 +28,52 @@ class _EditServoViewState extends State<EditServoView> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: textEditController,
-                decoration: const InputDecoration(
-                    labelText: "Servo open duration (ms)"),
-                keyboardType: TextInputType.number,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("PetBowlCam App"),
+        backgroundColor: Colors.amberAccent,
+      ),
+      body: Material(
+        child: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: textEditController,
+                  decoration: const InputDecoration(
+                      labelText: "Servo open duration (ms)"),
+                  keyboardType: TextInputType.number,
+                ),
               ),
-            ),
-            CheckboxListTile(
-              title: const Text("Should open servo on AI server HTTP timeout"),
-              value: openOnTimeout,
-              onChanged: (value) {
-                setState(() {
-                  openOnTimeout = value!;
-                });
-              },
-            ),
-            ElevatedButton(
-              onPressed: () {
-                widget.store.updateServoConfig(
-                    openOnTimeout, int.parse(textEditController.value.text));
+              CheckboxListTile(
+                title:
+                    const Text("Should open servo on AI server HTTP timeout"),
+                value: openOnTimeout,
+                onChanged: (value) {
+                  setState(() {
+                    openOnTimeout = value!;
+                  });
+                },
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  widget.store.updateServoConfig(
+                      openOnTimeout, int.parse(textEditController.value.text));
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HomePage(
-                      selectedIndex: 1,
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomePage(
+                        selectedIndex: 1,
+                      ),
                     ),
-                  ),
-                );
-              },
-              child: const Text("Save"),
-            ),
-          ],
+                  );
+                },
+                child: const Text("Save"),
+              ),
+            ],
+          ),
         ),
       ),
     );

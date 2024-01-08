@@ -25,53 +25,59 @@ class EditTimeServerView extends StatelessWidget {
     final TextEditingController thirdTimeServerController =
         TextEditingController(text: timeServer3);
 
-    return Material(
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              TextField(
-                controller: firstTimeServerController,
-                decoration: InputDecoration(
-                    labelText: "Time server 1",
-                    hintText:
-                        (timeServer1.isEmpty) ? "pool.ntp.org" : timeServer1),
-              ),
-              TextField(
-                controller: secondTimeServerController,
-                decoration: const InputDecoration(labelText: "Time server 2"),
-              ),
-              TextField(
-                controller: thirdTimeServerController,
-                decoration: const InputDecoration(labelText: "Time server 3"),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: ElevatedButton(
-                        onPressed: () {
-                          store.updateTimeServer(
-                              firstTimeServerController.value.text,
-                              secondTimeServerController.value.text,
-                              thirdTimeServerController.value.text);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("PetBowlCam App"),
+        backgroundColor: Colors.amberAccent,
+      ),
+      body: Material(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                TextField(
+                  controller: firstTimeServerController,
+                  decoration: InputDecoration(
+                      labelText: "Time server 1",
+                      hintText:
+                          (timeServer1.isEmpty) ? "pool.ntp.org" : timeServer1),
+                ),
+                TextField(
+                  controller: secondTimeServerController,
+                  decoration: const InputDecoration(labelText: "Time server 2"),
+                ),
+                TextField(
+                  controller: thirdTimeServerController,
+                  decoration: const InputDecoration(labelText: "Time server 3"),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: ElevatedButton(
+                          onPressed: () {
+                            store.updateTimeServer(
+                                firstTimeServerController.value.text,
+                                secondTimeServerController.value.text,
+                                thirdTimeServerController.value.text);
 
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HomePage(
-                                selectedIndex: 1,
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const HomePage(
+                                  selectedIndex: 1,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        child: const Text("Save/Resubmit")),
-                  ),
-                ],
-              )
-            ],
+                            );
+                          },
+                          child: const Text("Save/Resubmit")),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),

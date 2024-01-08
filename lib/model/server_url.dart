@@ -1,13 +1,11 @@
-class ServerUrl {
+import 'package:pet_bowl_cam_app/model/mqtt_server.dart';
+
+class Server {
   final String aiServer;
-  final String mqttServer;
+  final MqttServerProperty mqttServer;
 
-  ServerUrl({this.aiServer = "192.168.4.1", this.mqttServer = "127.0.0.1"});
-
-  Map<String, dynamic> toMap() {
-    return {
-      'aiServer': aiServer,
-      'mqttServer': mqttServer,
-    };
-  }
+  Server(
+      {this.aiServer = "192.168.4.1",
+      required this.mqttServer,
+      String? password});
 }

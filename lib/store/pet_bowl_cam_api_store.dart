@@ -2,6 +2,7 @@ import 'package:mobx/mobx.dart';
 import 'package:pet_bowl_cam_app/api/pet_bowl_cam_api.dart';
 import 'package:pet_bowl_cam_app/model/feeding_schedule.dart';
 import 'package:pet_bowl_cam_app/model/hardware.dart';
+import 'package:pet_bowl_cam_app/model/mqtt_server.dart';
 import 'package:pet_bowl_cam_app/model/server_url.dart';
 import 'package:pet_bowl_cam_app/model/servo.dart';
 import 'package:pet_bowl_cam_app/model/time_server.dart';
@@ -14,8 +15,6 @@ part 'pet_bowl_cam_api_store.g.dart';
 class PetBowlCamAPIStore = _PetBowlCamAPIStore with _$PetBowlCamAPIStore;
 
 abstract class _PetBowlCamAPIStore with Store {
-  // final PetBowlCamAPI _pbcApi = PetBowlCamAPI();
-
   @observable
   ObservableFuture<List<FeedingSchedule>> feedingSchedulesFuture =
       ObservableFuture.value([]);
@@ -39,8 +38,8 @@ abstract class _PetBowlCamAPIStore with Store {
       ObservableFuture.value(Hardware());
 
   @observable
-  ObservableFuture<ServerUrl> serverUrlFuture =
-      ObservableFuture.value(ServerUrl());
+  ObservableFuture<Server> serverUrlFuture = ObservableFuture.value(
+      Server(mqttServer: MqttServerProperty(topic: "test/test")));
 
   @action
   Future<List<FeedingSchedule>> getFeedingSchedules() {
@@ -190,13 +189,19 @@ abstract class _PetBowlCamAPIStore with Store {
   }
 
   @action
-  Future<ServerUrl> getServerUrl() async {
+  Future<Server> getServerUrl() async {
     final prefs = await SharedPreferences.getInstance();
+    final mqttServerProp = MqttServerProperty(
+        host: prefs.getString("mqttHost") ?? "127.0.0.1",
+        port: prefs.getInt("mqttPort") ?? 1883,
+        topic: prefs.getString("mqttTopic") ?? "topic/queue",
+        username: prefs.getString("mqttUsername"),
+        password: prefs.getString("mqttPassword"));
 
     serverUrlFuture = ObservableFuture.value(
-      ServerUrl(
+      Server(
         aiServer: prefs.getString("aiServer") ?? "192.168.4.1",
-        mqttServer: prefs.getString("mqttServer") ?? "127.0.0.1",
+        mqttServer: mqttServerProp,
       ),
     );
 
@@ -204,20 +209,24 @@ abstract class _PetBowlCamAPIStore with Store {
   }
 
   @action
-  Future<void> updateServerUrl(ServerUrl data) async {
+  Future<void> updateServerUrl(Server data) async {
     final prefs = await SharedPreferences.getInstance();
 
     if (!await prefs.setString("aiServer", data.aiServer) ||
-        !await prefs.setString("mqttServer", data.mqttServer)) {
-      throw "Failed to store data";
+        !await prefs.setString("mqttHost", data.mqttServer.host) ||
+        !await prefs.setInt("mqttPort", data.mqttServer.port) ||
+        !await prefs.setString("mqttTopic", data.mqttServer.topic)) {
+      throw Exception("Failed to store data");
     }
 
-    serverUrlFuture = ObservableFuture.value(
-      ServerUrl(
-        aiServer: prefs.getString("aiServer") ?? "192.168.4.1",
-        mqttServer: prefs.getString("mqttServer") ?? "127.0.0.1",
-      ),
-    );
+    if (data.mqttServer.username != null && data.mqttServer.password != null) {
+      if (!await prefs.setString("mqttUsername", data.mqttServer.username!) ||
+          !await prefs.setString("mqttPassword", data.mqttServer.password!)) {
+        throw Exception("Failed to store data");
+      }
+    }
+
+    serverUrlFuture = ObservableFuture.value(await getServerUrl());
   }
 
   @computed
@@ -227,6 +236,7 @@ abstract class _PetBowlCamAPIStore with Store {
       timezoneFuture.status == FutureStatus.pending &&
       servoFuture.status == FutureStatus.pending &&
       timeServerFuture.status == FutureStatus.pending &&
+      feedingSchedulesFuture.status == FutureStatus.pending &&
       hardwareInfoFuture.status == FutureStatus.pending;
 
   @computed
@@ -236,6 +246,7 @@ abstract class _PetBowlCamAPIStore with Store {
       timezoneFuture.status == FutureStatus.rejected &&
       servoFuture.status == FutureStatus.rejected &&
       timeServerFuture.status == FutureStatus.rejected &&
+      feedingSchedulesFuture.status == FutureStatus.rejected &&
       hardwareInfoFuture.status == FutureStatus.rejected;
 
   @computed
@@ -245,6 +256,7 @@ abstract class _PetBowlCamAPIStore with Store {
       timezoneFuture.status == FutureStatus.fulfilled &&
       servoFuture.status == FutureStatus.fulfilled &&
       timeServerFuture.status == FutureStatus.fulfilled &&
+      feedingSchedulesFuture.status == FutureStatus.fulfilled &&
       hardwareInfoFuture.status == FutureStatus.fulfilled;
 
   void initStore() {

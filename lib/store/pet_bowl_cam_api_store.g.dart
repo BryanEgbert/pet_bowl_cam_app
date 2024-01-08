@@ -132,13 +132,13 @@ mixin _$PetBowlCamAPIStore on _PetBowlCamAPIStore, Store {
       Atom(name: '_PetBowlCamAPIStore.serverUrlFuture', context: context);
 
   @override
-  ObservableFuture<ServerUrl> get serverUrlFuture {
+  ObservableFuture<Server> get serverUrlFuture {
     _$serverUrlFutureAtom.reportRead();
     return super.serverUrlFuture;
   }
 
   @override
-  set serverUrlFuture(ObservableFuture<ServerUrl> value) {
+  set serverUrlFuture(ObservableFuture<Server> value) {
     _$serverUrlFutureAtom.reportWrite(value, super.serverUrlFuture, () {
       super.serverUrlFuture = value;
     });
@@ -228,7 +228,7 @@ mixin _$PetBowlCamAPIStore on _PetBowlCamAPIStore, Store {
       AsyncAction('_PetBowlCamAPIStore.getServerUrl', context: context);
 
   @override
-  Future<ServerUrl> getServerUrl() {
+  Future<Server> getServerUrl() {
     return _$getServerUrlAsyncAction.run(() => super.getServerUrl());
   }
 
@@ -236,7 +236,7 @@ mixin _$PetBowlCamAPIStore on _PetBowlCamAPIStore, Store {
       AsyncAction('_PetBowlCamAPIStore.updateServerUrl', context: context);
 
   @override
-  Future<void> updateServerUrl(ServerUrl data) {
+  Future<void> updateServerUrl(Server data) {
     return _$updateServerUrlAsyncAction.run(() => super.updateServerUrl(data));
   }
 

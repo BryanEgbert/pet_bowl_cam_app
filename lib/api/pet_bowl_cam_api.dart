@@ -19,7 +19,9 @@ class PetBowlCamAPI {
   }
 
   Future<List<FeedingSchedule>> getFeedingSchedules() async {
-    http.Response res = await http.get(Uri.http(baseURL, "/feeding_schedule"));
+    http.Response res = await http
+        .get(Uri.http(baseURL, "/feeding_schedule"))
+        .timeout(const Duration(seconds: 10));
 
     if (res.statusCode != 200) {
       throw HttpException(jsonDecode(res.body)['message']);
@@ -31,8 +33,11 @@ class PetBowlCamAPI {
   }
 
   Future<bool> createFeedingSchedule(FeedingSchedule data) async {
-    http.Response res = await http.post(Uri.http(baseURL, "/feeding_schedule"),
-        headers: {'Content-Type': 'application/json'}, body: jsonEncode(data));
+    http.Response res = await http
+        .post(Uri.http(baseURL, "/feeding_schedule"),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(data))
+        .timeout(const Duration(seconds: 10));
 
     if (res.statusCode != 204) {
       throw HttpException(jsonDecode(res.body)['message']);
@@ -45,15 +50,20 @@ class PetBowlCamAPI {
     Map<String, dynamic> body = {"id": id};
     body.addAll(data.toJson());
 
-    http.Response res = await http.post(Uri.http(baseURL, "/feeding_schedule"),
-        headers: {'Content-Type': 'application/json'}, body: json.encode(body));
+    http.Response res = await http
+        .post(Uri.http(baseURL, "/feeding_schedule"),
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode(body))
+        .timeout(const Duration(seconds: 10));
 
     return res.statusCode == 204;
   }
 
   Future<bool> deleteFeedingSchedule(int index) async {
-    http.Response res = await http.delete(
-        Uri.http(baseURL, "/feeding_schedule", {"id": index.toString()}));
+    http.Response res = await http
+        .delete(
+            Uri.http(baseURL, "/feeding_schedule", {"id": index.toString()}))
+        .timeout(const Duration(seconds: 10));
 
     if (res.statusCode != 204) {
       throw HttpException(jsonDecode(res.body)['message']);
@@ -63,7 +73,9 @@ class PetBowlCamAPI {
   }
 
   Future<WiFi> getConnectedWiFi() async {
-    http.Response res = await http.get(Uri.http(baseURL, "/wifi"));
+    http.Response res = await http
+        .get(Uri.http(baseURL, "/wifi"))
+        .timeout(const Duration(seconds: 10));
 
     if (res.statusCode != 200) {
       throw HttpException(jsonDecode(res.body)['message']);
@@ -80,7 +92,7 @@ class PetBowlCamAPI {
     }, body: <String, dynamic>{
       'ssid': ssid,
       'password': password
-    });
+    }).timeout(const Duration(seconds: 10));
 
     if (res.statusCode != 204) {
       throw HttpException(jsonDecode(res.body)['message']);
@@ -90,7 +102,9 @@ class PetBowlCamAPI {
   }
 
   Future<Timezone> getTimeZone() async {
-    http.Response res = await http.get(Uri.http(baseURL, "/tz"));
+    http.Response res = await http
+        .get(Uri.http(baseURL, "/tz"))
+        .timeout(const Duration(seconds: 10));
 
     if (res.statusCode != 200) {
       throw HttpException(jsonDecode(res.body)['message']);
@@ -102,8 +116,8 @@ class PetBowlCamAPI {
   }
 
   Future<bool> updateTimeZone(String tz) async {
-    http.Response res =
-        await http.post(Uri.http(baseURL, "/tz"), body: {'tz': tz});
+    http.Response res = await http.post(Uri.http(baseURL, "/tz"),
+        body: {'tz': tz}).timeout(const Duration(seconds: 10));
 
     if (res.statusCode != 204) {
       throw HttpException(jsonDecode(res.body)['message']);
@@ -113,7 +127,9 @@ class PetBowlCamAPI {
   }
 
   Future<Servo> getServoConfig() async {
-    http.Response res = await http.get(Uri.http(baseURL, "/servo"));
+    http.Response res = await http
+        .get(Uri.http(baseURL, "/servo"))
+        .timeout(const Duration(seconds: 10));
 
     if (res.statusCode != 200) {
       throw HttpException(jsonDecode(res.body)['message']);
@@ -131,7 +147,7 @@ class PetBowlCamAPI {
     }, body: {
       'shouldOpenIfTimeout': shouldOpenIfTimeout.toString(),
       'servoOpenMs': servoOpenMs.toString(),
-    });
+    }).timeout(const Duration(seconds: 10));
 
     if (res.statusCode != 204) {
       throw HttpException(jsonDecode(res.body)['message']);
@@ -141,7 +157,9 @@ class PetBowlCamAPI {
   }
 
   Future<TimeServer> getTimeServers() async {
-    http.Response res = await http.get(Uri.http(baseURL, "/time-server"));
+    http.Response res = await http
+        .get(Uri.http(baseURL, "/time-server"))
+        .timeout(const Duration(seconds: 10));
 
     if (res.statusCode != 200) {
       throw HttpException(jsonDecode(res.body)['message']);
@@ -158,7 +176,7 @@ class PetBowlCamAPI {
       'timeServerUrl1': url1,
       'timeServerUrl2': url2,
       'timeServerUrl3': url3,
-    });
+    }).timeout(const Duration(seconds: 10));
 
     if (res.statusCode != 204) {
       throw HttpException(jsonDecode(res.body)['message']);
@@ -168,7 +186,9 @@ class PetBowlCamAPI {
   }
 
   Future<Hardware> getHardwareInfo() async {
-    http.Response res = await http.get(Uri.http(baseURL, "/hardware"));
+    http.Response res = await http
+        .get(Uri.http(baseURL, "/hardware"))
+        .timeout(const Duration(seconds: 10));
 
     if (res.statusCode != 200) {
       throw HttpException(jsonDecode(res.body)['message']);
@@ -178,7 +198,9 @@ class PetBowlCamAPI {
   }
 
   Future<bool> openServo() async {
-    http.Response res = await http.post(Uri.http(baseURL, "/servo/open"));
+    http.Response res = await http
+        .post(Uri.http(baseURL, "/servo/open"))
+        .timeout(const Duration(seconds: 10));
 
     if (res.statusCode != 202) {
       throw HttpException(jsonDecode(res.body)['message']);
@@ -188,7 +210,9 @@ class PetBowlCamAPI {
   }
 
   Future<bool> resetBoard() async {
-    http.Response res = await http.post(Uri.http(baseURL, "/reset"));
+    http.Response res = await http
+        .post(Uri.http(baseURL, "/reset"))
+        .timeout(const Duration(seconds: 10));
 
     return res.statusCode == 204;
   }

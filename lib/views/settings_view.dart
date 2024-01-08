@@ -12,6 +12,7 @@ import 'package:pet_bowl_cam_app/views/edit_servo_view.dart';
 import 'package:pet_bowl_cam_app/views/edit_time_server_view.dart';
 import 'package:pet_bowl_cam_app/views/edit_timezone_view.dart';
 import 'package:pet_bowl_cam_app/views/edit_wifi_view.dart';
+import 'package:pet_bowl_cam_app/views/error_view.dart';
 import 'package:pet_bowl_cam_app/views/hardware_info_view.dart';
 
 class SettingsView extends StatelessWidget {
@@ -24,6 +25,7 @@ class SettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // store.initStore();
     return Observer(
       builder: (context) {
         final wifiFuture = store.wifiFuture;
@@ -34,22 +36,11 @@ class SettingsView extends StatelessWidget {
         final serverUrlFuture = store.serverUrlFuture;
 
         if (store.isRejected) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Failed to load data.\nReason: ${wifiFuture.error.message}",
-                ),
-                IconButton(
-                  onPressed: () {
-                    store.initStore();
-                    return;
-                  },
-                  icon: const Icon(Icons.refresh_rounded),
-                )
-              ],
-            ),
+          return ErrorView(
+            errorMessage: wifiFuture.error.message,
+            refreshCallback: () {
+              store.initStore();
+            },
           );
         } else if (store.isFulfilled) {
           WiFi wifiInfo = wifiFuture.result;
@@ -57,7 +48,7 @@ class SettingsView extends StatelessWidget {
           Servo servoInfo = servoFuture.result;
           Hardware hardwareInfo = hardwareInfoFuture.result;
           TimeServer timeServerInfo = timeServerFuture.result;
-          ServerUrl serverUrlInfo = serverUrlFuture.result;
+          Server serverUrlInfo = serverUrlFuture.result;
 
           return ListView.custom(
             physics: const NeverScrollableScrollPhysics(),

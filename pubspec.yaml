@@ -39,6 +39,8 @@ dependencies:
   flutter_mobx: ^2.2.0+1
   http: ^1.1.2
   shared_preferences: ^2.2.2
+  mqtt_client: ^10.0.1
+  workmanager: ^0.5.2
 
 dev_dependencies:
   flutter_test:
