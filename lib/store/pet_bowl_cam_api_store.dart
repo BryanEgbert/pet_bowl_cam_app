@@ -241,7 +241,6 @@ abstract class _PetBowlCamAPIStore with Store {
 
   @computed
   bool get isRejected =>
-      serverUrlFuture.status == FutureStatus.rejected &&
       wifiFuture.status == FutureStatus.rejected &&
       timezoneFuture.status == FutureStatus.rejected &&
       servoFuture.status == FutureStatus.rejected &&

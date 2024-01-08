@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobx/src/api/async.dart';
-import 'package:pet_bowl_cam_app/model/feeding_schedule.dart';
-import 'package:pet_bowl_cam_app/store/pet_bowl_cam_api_store.dart';
 
 class ErrorView extends StatelessWidget {
   const ErrorView({

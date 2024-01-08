@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:mobx/src/api/async.dart';
 import 'package:pet_bowl_cam_app/model/feeding_schedule.dart';
 import 'package:pet_bowl_cam_app/store/pet_bowl_cam_api_store.dart';
 import 'package:pet_bowl_cam_app/views/error_view.dart';
@@ -15,7 +14,6 @@ class FeedingScheduleView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // store.initStore();
     return Observer(builder: (context) {
       final future = store.feedingSchedulesFuture;
 
