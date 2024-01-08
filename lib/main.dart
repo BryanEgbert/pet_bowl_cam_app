@@ -1,63 +1,13 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:mqtt_client/mqtt_client.dart';
 // ignore: implementation_imports
 import 'package:pet_bowl_cam_app/model/feeding_schedule.dart';
-import 'package:pet_bowl_cam_app/model/mqtt_server.dart';
-import 'package:pet_bowl_cam_app/service/mqtt_service.dart';
 import 'package:pet_bowl_cam_app/store/pet_bowl_cam_mqtt_store.dart';
 import 'package:pet_bowl_cam_app/views/feeding_schedule_view.dart';
 import 'package:pet_bowl_cam_app/store/pet_bowl_cam_api_store.dart';
 import 'package:pet_bowl_cam_app/views/notification_view.dart';
 import 'package:pet_bowl_cam_app/views/settings_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:workmanager/workmanager.dart';
-
-// @pragma('vm:entry-point')
-// void callbackDispatcher() {
-//   Workmanager().executeTask((task, inputData) async {
-//     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-//     final MqttService mqttService = MqttService(
-//       clientId: DateTime.now().millisecondsSinceEpoch.toString(),
-//       property: MqttServerProperty(
-//         host: prefs.getString("mqttHost") ?? "127.0.0.1",
-//         port: prefs.getInt("mqttPort") ?? 1883,
-//         topic: prefs.getString("mqttTopic") ?? "topic/queue",
-//         username: prefs.getString("mqttUsername"),
-//         password: prefs.getString("mqttPassword"),
-//       ),
-//     );
-
-//     final client = mqttService.connect();
-//     await client.connect();
-//     client.subscribe(
-//         prefs.getString("mqttTopic") ?? "topic/queue", MqttQos.atLeastOnce);
-
-//     while (true) {
-//       client.updates?.listen((event) {
-//         final message = event[0].payload as MqttPublishMessage;
-
-//         print(
-//             "${event[0].topic} - ${MqttPublishPayload.bytesToStringAsString(message.payload.message)}");
-//         Future.delayed(const Duration(seconds: 5));
-//       });
-//     }
-
-//     return Future.value(true);
-//   });
-// }
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  // Workmanager().initialize(
-  //   callbackDispatcher,
-  //   isInDebugMode: true,
-  // );
-  // Workmanager().registerOneOffTask("task-identifier", "mqttListener",
-  //     constraints: Constraints(networkType: NetworkType.connected));
-
   runApp(const MyApp());
 }
 
@@ -95,8 +45,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    petBowlMqttStore.connect();
     petBowlCamApiStore.initStore();
+    petBowlMqttStore.connect();
 
     _selectedIndex = widget.selectedIndex;
     super.initState();
@@ -105,8 +55,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     // petBowlCamApiStore.initStore();
-    petBowlCamApiStore.initStore();
-
     List<Widget> widgets = [
       FeedingScheduleView(store: petBowlCamApiStore),
       SettingsView(
