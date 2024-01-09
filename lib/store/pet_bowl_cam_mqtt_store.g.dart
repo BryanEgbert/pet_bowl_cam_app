@@ -9,20 +9,19 @@ part of 'pet_bowl_cam_mqtt_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$PetBowlCamMqttStore on _PetBowlCamMqttStore, Store {
-  late final _$mqttStreamAtom =
-      Atom(name: '_PetBowlCamMqttStore.mqttStream', context: context);
+  late final _$messagesAtom =
+      Atom(name: '_PetBowlCamMqttStore.messages', context: context);
 
   @override
-  ObservableStream<List<MqttReceivedMessage<MqttMessage>>>? get mqttStream {
-    _$mqttStreamAtom.reportRead();
-    return super.mqttStream;
+  ObservableList<MqttReceivedMessage<MqttMessage>>? get messages {
+    _$messagesAtom.reportRead();
+    return super.messages;
   }
 
   @override
-  set mqttStream(
-      ObservableStream<List<MqttReceivedMessage<MqttMessage>>>? value) {
-    _$mqttStreamAtom.reportWrite(value, super.mqttStream, () {
-      super.mqttStream = value;
+  set messages(ObservableList<MqttReceivedMessage<MqttMessage>>? value) {
+    _$messagesAtom.reportWrite(value, super.messages, () {
+      super.messages = value;
     });
   }
 
@@ -42,36 +41,19 @@ mixin _$PetBowlCamMqttStore on _PetBowlCamMqttStore, Store {
     });
   }
 
-  late final _$connStatusFutureAtom =
-      Atom(name: '_PetBowlCamMqttStore.connStatusFuture', context: context);
-
-  @override
-  ObservableFuture<MqttClientConnectionStatus?> get connStatusFuture {
-    _$connStatusFutureAtom.reportRead();
-    return super.connStatusFuture;
-  }
-
-  @override
-  set connStatusFuture(ObservableFuture<MqttClientConnectionStatus?> value) {
-    _$connStatusFutureAtom.reportWrite(value, super.connStatusFuture, () {
-      super.connStatusFuture = value;
-    });
-  }
-
   late final _$connectAsyncAction =
       AsyncAction('_PetBowlCamMqttStore.connect', context: context);
 
   @override
-  Future<MqttClientConnectionStatus?> connect() {
+  Future<void> connect() {
     return _$connectAsyncAction.run(() => super.connect());
   }
 
   @override
   String toString() {
     return '''
-mqttStream: ${mqttStream},
-mqttClient: ${mqttClient},
-connStatusFuture: ${connStatusFuture}
+messages: ${messages},
+mqttClient: ${mqttClient}
     ''';
   }
 }
