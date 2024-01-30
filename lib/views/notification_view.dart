@@ -37,15 +37,15 @@ class _NotificationViewState extends State<NotificationView> {
               return ListView.separated(
                 itemCount: widget.store.messages?.length ?? 0,
                 itemBuilder: (context, index) {
-                  // final value = widget.store.mqttStream?.value;
+                  final content = widget.store.mqttMessageToListTile(
+                      MqttPublishPayload.bytesToStringAsString((widget.store
+                              .messages?[index].payload as MqttPublishMessage)
+                          .payload
+                          .message));
 
                   return ListTile(
-                    title: Text(MqttPublishPayload.bytesToStringAsString((widget
-                            .store
-                            .messages?[index]
-                            .payload as MqttPublishMessage)
-                        .payload
-                        .message)),
+                    title: Text(content["title"]),
+                    subtitle: Text(content["subtitle"]),
                   );
                 },
                 separatorBuilder: (BuildContext context, int index) {
@@ -57,11 +57,5 @@ class _NotificationViewState extends State<NotificationView> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    widget.store.dispose();
-    super.dispose();
   }
 }

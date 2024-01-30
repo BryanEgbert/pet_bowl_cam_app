@@ -9,27 +9,27 @@ part of 'pet_bowl_cam_api_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$PetBowlCamAPIStore on _PetBowlCamAPIStore, Store {
-  Computed<bool>? _$isPendingComputed;
+  Computed<bool>? _$settingsIsPendingComputed;
 
   @override
-  bool get isPending =>
-      (_$isPendingComputed ??= Computed<bool>(() => super.isPending,
-              name: '_PetBowlCamAPIStore.isPending'))
-          .value;
-  Computed<bool>? _$isRejectedComputed;
+  bool get settingsIsPending => (_$settingsIsPendingComputed ??= Computed<bool>(
+          () => super.settingsIsPending,
+          name: '_PetBowlCamAPIStore.settingsIsPending'))
+      .value;
+  Computed<bool>? _$settingsIsRejectedComputed;
 
   @override
-  bool get isRejected =>
-      (_$isRejectedComputed ??= Computed<bool>(() => super.isRejected,
-              name: '_PetBowlCamAPIStore.isRejected'))
-          .value;
-  Computed<bool>? _$isFulfilledComputed;
+  bool get settingsIsRejected => (_$settingsIsRejectedComputed ??=
+          Computed<bool>(() => super.settingsIsRejected,
+              name: '_PetBowlCamAPIStore.settingsIsRejected'))
+      .value;
+  Computed<bool>? _$settingsIsFulfilledComputed;
 
   @override
-  bool get isFulfilled =>
-      (_$isFulfilledComputed ??= Computed<bool>(() => super.isFulfilled,
-              name: '_PetBowlCamAPIStore.isFulfilled'))
-          .value;
+  bool get settingsIsFulfilled => (_$settingsIsFulfilledComputed ??=
+          Computed<bool>(() => super.settingsIsFulfilled,
+              name: '_PetBowlCamAPIStore.settingsIsFulfilled'))
+      .value;
 
   late final _$feedingSchedulesFutureAtom = Atom(
       name: '_PetBowlCamAPIStore.feedingSchedulesFuture', context: context);
@@ -319,9 +319,9 @@ servoFuture: ${servoFuture},
 timeServerFuture: ${timeServerFuture},
 hardwareInfoFuture: ${hardwareInfoFuture},
 serverUrlFuture: ${serverUrlFuture},
-isPending: ${isPending},
-isRejected: ${isRejected},
-isFulfilled: ${isFulfilled}
+settingsIsPending: ${settingsIsPending},
+settingsIsRejected: ${settingsIsRejected},
+settingsIsFulfilled: ${settingsIsFulfilled}
     ''';
   }
 }

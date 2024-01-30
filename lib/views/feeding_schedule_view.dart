@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:mobx/mobx.dart';
 import 'package:pet_bowl_cam_app/model/feeding_schedule.dart';
 import 'package:pet_bowl_cam_app/store/pet_bowl_cam_api_store.dart';
 import 'package:pet_bowl_cam_app/views/error_view.dart';
@@ -17,13 +18,13 @@ class FeedingScheduleView extends StatelessWidget {
     return Observer(builder: (context) {
       final future = store.feedingSchedulesFuture;
 
-      if (store.isRejected) {
+      if (future.status == FutureStatus.rejected) {
         return ErrorView(
             errorMessage: future.error.message,
             refreshCallback: () {
               store.initStore();
             });
-      } else if (store.isFulfilled) {
+      } else if (future.status == FutureStatus.fulfilled) {
         List<FeedingSchedule> feedingSchedules = future.result;
         return Column(
           children: [
@@ -127,6 +128,10 @@ class FeedingScheduleView extends StatelessWidget {
             children: [
               CircularProgressIndicator.adaptive(),
               Text("Fetching data..."),
+              Text(
+                "Note: The first time you open the app,\npress the refresh button for the load to complete",
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         );

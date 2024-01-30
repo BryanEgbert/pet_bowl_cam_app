@@ -230,32 +230,28 @@ abstract class _PetBowlCamAPIStore with Store {
   }
 
   @computed
-  bool get isPending =>
-      serverUrlFuture.status == FutureStatus.pending &&
-      wifiFuture.status == FutureStatus.pending &&
-      timezoneFuture.status == FutureStatus.pending &&
-      servoFuture.status == FutureStatus.pending &&
-      timeServerFuture.status == FutureStatus.pending &&
-      feedingSchedulesFuture.status == FutureStatus.pending &&
+  bool get settingsIsPending =>
+      wifiFuture.status == FutureStatus.pending ||
+      timezoneFuture.status == FutureStatus.pending ||
+      servoFuture.status == FutureStatus.pending ||
+      timeServerFuture.status == FutureStatus.pending ||
       hardwareInfoFuture.status == FutureStatus.pending;
 
   @computed
-  bool get isRejected =>
+  bool get settingsIsRejected =>
       wifiFuture.status == FutureStatus.rejected &&
       timezoneFuture.status == FutureStatus.rejected &&
       servoFuture.status == FutureStatus.rejected &&
       timeServerFuture.status == FutureStatus.rejected &&
-      feedingSchedulesFuture.status == FutureStatus.rejected &&
       hardwareInfoFuture.status == FutureStatus.rejected;
 
   @computed
-  bool get isFulfilled =>
+  bool get settingsIsFulfilled =>
       serverUrlFuture.status == FutureStatus.fulfilled &&
       wifiFuture.status == FutureStatus.fulfilled &&
       timezoneFuture.status == FutureStatus.fulfilled &&
       servoFuture.status == FutureStatus.fulfilled &&
       timeServerFuture.status == FutureStatus.fulfilled &&
-      feedingSchedulesFuture.status == FutureStatus.fulfilled &&
       hardwareInfoFuture.status == FutureStatus.fulfilled;
 
   void initStore() {
@@ -266,7 +262,7 @@ abstract class _PetBowlCamAPIStore with Store {
     getFeedingSchedules();
     getTimeZone();
     getServoConfig();
-    getTimeServer();
     getHardwareInfo();
+    getTimeServer();
   }
 }

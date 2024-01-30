@@ -54,7 +54,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // petBowlCamApiStore.initStore();
     List<Widget> widgets = [
       FeedingScheduleView(store: petBowlCamApiStore),
       SettingsView(
@@ -132,5 +131,11 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    petBowlMqttStore.dispose();
+    super.dispose();
   }
 }

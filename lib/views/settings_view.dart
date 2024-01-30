@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:mobx/mobx.dart';
 import 'package:pet_bowl_cam_app/model/hardware.dart';
 import 'package:pet_bowl_cam_app/model/server_url.dart';
 import 'package:pet_bowl_cam_app/model/servo.dart';
@@ -35,21 +36,10 @@ class SettingsView extends StatelessWidget {
         final timeServerFuture = store.timeServerFuture;
         final serverUrlFuture = store.serverUrlFuture;
 
-        if (store.isRejected) {
-          return ErrorView(
-            errorMessage: wifiFuture.error.message,
-            refreshCallback: () {
-              store.initStore();
-            },
-          );
-        } else if (store.isFulfilled) {
-          WiFi wifiInfo = wifiFuture.result;
-          Timezone timezoneInfo = timezoneFuture.result;
-          Servo servoInfo = servoFuture.result;
-          Hardware hardwareInfo = hardwareInfoFuture.result;
-          TimeServer timeServerInfo = timeServerFuture.result;
-          Server serverUrlInfo = serverUrlFuture.result;
+        Server serverUrlInfo = serverUrlFuture.result;
 
+        if (serverUrlFuture.status == FutureStatus.fulfilled &&
+            store.settingsIsPending == true) {
           return ListView.custom(
             physics: const NeverScrollableScrollPhysics(),
             childrenDelegate: SliverChildListDelegate([
@@ -70,20 +60,72 @@ class SettingsView extends StatelessWidget {
                 },
               ),
               const Divider(thickness: 0),
-              ListTile(
-                leading: const Icon(Icons.location_on_outlined),
-                title: const Text("Timezone"),
-                subtitle: Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Text(timezoneInfo.tz),
+              const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator.adaptive(),
+                    Text("Fetching data..."),
+                    Text(
+                      "Note: If loading took too long, try refreshing it",
+                    )
+                  ],
                 ),
+              ),
+            ]),
+          );
+        }
+
+        if (store.settingsIsRejected) {
+          return ListView.custom(
+            physics: const NeverScrollableScrollPhysics(),
+            childrenDelegate: SliverChildListDelegate([
+              ListTile(
+                leading: const Icon(Icons.link),
+                title: const Text("Server URL"),
+                subtitle: const Text("Configure server URL"),
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => EditTimezoneView(
+                      builder: (context) => EditServerUrlView(
+                        initialInfo: serverUrlInfo,
                         store: store,
-                        currentTimezone: timezoneInfo.tz,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const Divider(thickness: 0),
+              ErrorView(
+                errorMessage: wifiFuture.error.message,
+                refreshCallback: () {
+                  store.initStore();
+                },
+              ),
+            ]),
+          );
+        } else if (store.settingsIsFulfilled) {
+          WiFi wifiInfo = wifiFuture.result;
+          Timezone timezoneInfo = timezoneFuture.result;
+          Servo servoInfo = servoFuture.result;
+          Hardware hardwareInfo = hardwareInfoFuture.result;
+          TimeServer timeServerInfo = timeServerFuture.result;
+
+          return ListView.custom(
+            physics: const NeverScrollableScrollPhysics(),
+            childrenDelegate: SliverChildListDelegate([
+              ListTile(
+                leading: const Icon(Icons.link),
+                title: const Text("Server URL"),
+                subtitle: const Text("Configure server URL"),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditServerUrlView(
+                        initialInfo: serverUrlInfo,
+                        store: store,
                       ),
                     ),
                   );
@@ -114,6 +156,26 @@ class SettingsView extends StatelessWidget {
                         EditWiFiView(store: store, initialValue: wifiInfo),
                   ),
                 ),
+              ),
+              const Divider(thickness: 0),
+              ListTile(
+                leading: const Icon(Icons.location_on_outlined),
+                title: const Text("Timezone"),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Text(timezoneInfo.tz),
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditTimezoneView(
+                        store: store,
+                        currentTimezone: timezoneInfo.tz,
+                      ),
+                    ),
+                  );
+                },
               ),
               const Divider(thickness: 0),
               ListTile(
@@ -234,6 +296,9 @@ class SettingsView extends StatelessWidget {
               children: [
                 CircularProgressIndicator.adaptive(),
                 Text("Fetching data..."),
+                Text(
+                  "Note: If the load took too long, try refreshing it",
+                )
               ],
             ),
           );

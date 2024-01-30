@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:mobx/mobx.dart';
 import 'package:mqtt_client/mqtt_client.dart';
@@ -47,6 +48,37 @@ abstract class _PetBowlCamMqttStore with Store {
       await for (final val in client.updates!) {
         messages!.addAll(val);
       }
+    }
+  }
+
+  Map mqttMessageToListTile(String jsonString) {
+    var jsonMessage = json.decode(jsonString);
+
+    switch (jsonMessage["type"]) {
+      case "lastWill":
+        return {
+          "title": "Hardware Disconnected Unexpectedly",
+          "subtitle": DateTime.now().toString()
+        };
+      case "deviceResetNotification":
+        return {"title": "Hardware Got Reset", "subtitle": jsonMessage["id"]};
+      case "getLocalTIme":
+        return {
+          "title": jsonMessage["error"] == true
+              ? "Failed Fetching Local Time"
+              : "Successfully Fetched Local Time",
+          "subtitle": jsonMessage["id"]
+        };
+      case "serverResponse":
+        return {
+          "title": 'AI Top Prediction: ${jsonMessage["data"]["top"]}',
+          "subtitle": jsonMessage["data"]["prediction"]
+        };
+      default:
+        return {
+          "title": "Unknown Error",
+          "subtitle": "An unknown error has occured"
+        };
     }
   }
 
